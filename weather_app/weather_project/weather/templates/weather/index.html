@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Dashboard</title>
+    <link rel="stylesheet" href="{% static 'weather/style.css' %}" />
+</head>
+<body>
+    <main class="page">
+        <section class="app-card">
+            <header class="app-header">
+                <div>
+                    <p class="eyebrow">Skywatch</p>
+                    <h1 class="title">Weather Dashboard</h1>
+                    <p class="subtitle">Search a city to see current conditions in real time.</p>
+                </div>
+            </header>
+
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="message message-error">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if error_message %}
+                <div class="messages">
+                    <div class="message message-error">{{ error_message }}</div>
+                </div>
+            {% endif %}
+
+            <form class="search-form" method="post">
+                {% csrf_token %}
+                <input
+                    type="text"
+                    name="city"
+                    placeholder="Enter city name"
+                    aria-label="City name"
+                    required
+                />
+                <button type="submit">Search</button>
+            </form>
+
+            {% if weather %}
+                <section class="weather-card">
+                    <div class="weather-main">
+                        <img
+                            src="https://openweathermap.org/img/wn/{{ weather.icon }}@2x.png"
+                            alt="{{ weather.description }}"
+                        />
+                        <div>
+                            <h2>{{ weather.city }}</h2>
+                            <p class="temp">{{ weather.temperature }}&deg;C</p>
+                            <p class="condition">{{ weather.description }}</p>
+                        </div>
+                    </div>
+                    <div class="weather-details">
+                        <div>
+                            <span>Humidity</span>
+                            <strong>{{ weather.humidity }}%</strong>
+                        </div>
+                        <div>
+                            <span>Wind Speed</span>
+                            <strong>{{ weather.wind_speed }} m/s</strong>
+                        </div>
+                    </div>
+                </section>
+            {% endif %}
+
+            {% if recent_searches %}
+                <section class="recent">
+                    <h3>Recent Searches</h3>
+                    <div class="recent-list">
+                        {% for city in recent_searches %}
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="city" value="{{ city }}" />
+                                <button type="submit">{{ city }}</button>
+                            </form>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>
