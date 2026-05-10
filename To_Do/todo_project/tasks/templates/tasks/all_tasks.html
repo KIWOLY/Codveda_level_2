@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Tasks</title>
+    <link rel="stylesheet" href="{% static 'tasks/style.css' %}" />
+</head>
+
+<body>
+    <main class="page">
+        <section class="app-card">
+            <header class="app-header">
+                <div>
+                    <p class="eyebrow">Personal Planner</p>
+                    <h1 class="title">All Tasks</h1>
+                    <p class="subtitle">Review everything in one place.</p>
+                </div>
+                <div class="counter">
+                    <span class="counter-label">Total</span>
+                    <span class="counter-value">{{ total_count }}</span>
+                </div>
+            </header>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <span class="stat-label">Completed</span>
+                    <span class="stat-value">{{ completed_count }}</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Not Completed</span>
+                    <span class="stat-value">{{ remaining_count }}</span>
+                </div>
+            </div>
+
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message message-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="toolbar">
+                <a class="button secondary" href="{% url 'tasks:index' %}">Back to Today</a>
+            </div>
+
+            <div class="task-list">
+                {% if tasks %}
+                {% for task in tasks %}
+                <div class="task-item {% if task.completed %}task-completed{% endif %}">
+                    <form class="task-toggle" action="{% url 'tasks:toggle' task.id %}" method="post">
+                        {% csrf_token %}
+                        <label class="checkbox">
+                            <input type="checkbox" {% if task.completed %}checked{% endif %} />
+                            <span class="checkmark"></span>
+                        </label>
+                    </form>
+                    <div class="task-info">
+                        <p class="task-title">{{ task.title }}</p>
+                        <p class="task-date">Created {{ task.created_at|date:"M j, Y" }}</p>
+                    </div>
+                    <div class="task-actions">
+                        <a class="button ghost" href="{% url 'tasks:edit' task.id %}">Edit</a>
+                        <form class="task-delete" action="{% url 'tasks:delete' task.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" aria-label="Delete task">Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <p>No tasks yet. Add your first task on the home page.</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.querySelectorAll('.task-toggle input[type="checkbox"]').forEach(function (checkbox) {
+            checkbox.addEventListener('change', function () {
+                checkbox.closest('form').submit();
+            });
+        });
+    </script>
+</body>
+
+</html>

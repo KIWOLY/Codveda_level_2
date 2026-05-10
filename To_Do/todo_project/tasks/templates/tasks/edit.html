@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Task</title>
+    <link rel="stylesheet" href="{% static 'tasks/style.css' %}" />
+</head>
+
+<body>
+    <main class="page">
+        <section class="app-card">
+            <header class="app-header">
+                <div>
+                    <p class="eyebrow">Personal Planner</p>
+                    <h1 class="title">Edit Task</h1>
+                    <p class="subtitle">Update your task title and save.</p>
+                </div>
+                <div class="counter">
+                    <span class="counter-label">Status</span>
+                    <span class="counter-value">{% if task.completed %}Done{% else %}Open{% endif %}</span>
+                </div>
+            </header>
+
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message message-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form class="task-form" action="{% url 'tasks:edit' task.id %}" method="post">
+                {% csrf_token %}
+                <input type="text" name="title" value="{{ task.title }}" maxlength="200" aria-label="Task title"
+                    required />
+                <button type="submit">Save Changes</button>
+            </form>
+
+            <div class="toolbar">
+                <a class="button secondary" href="{% url 'tasks:all' %}">Back to All Tasks</a>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>
